@@ -13,36 +13,20 @@ function kron_N_sites(mat, N, index)
     return res
 end
 
-# computes the long-range hamiltonian that can be found in "Unifying blabla...", p.4 eq.(7)
 function build_hamiltonian_stupid(N::Int64, alpha::ComplexF64, J::ComplexF64)
     res = zeros(ComplexF64, 2^N, 2^N)
     for i in 1:(N-1), j in (i+1):N
             h_ij = kron_N_sites(pauli_x(), N, i) * kron_N_sites(pauli_x(), N, j) + 
-kron_N_sites(pauli_y(), N, i)
-            sig_j_y = kron_N_sites(pauli_y(), N, j)
-
-            h_ij = sig_i_x * sig_j_x + sig_i_y * sig_j_y
-
-            res = res + (1 / abs(i - j)^alpha) * h_ij
-        end
+               kron_N_sites(pauli_y(), N, i) * kron_N_sites(pauli_y(), N, j)
+        res += (1 / abs(i - j)^alpha) * h_ij
     end
-    return J/2 * res
+    return (J/2) * res
 end
 
-####### using TT representation
-
-#takes a 2x2 matrix and returns the corresponding 2x2x1x1 tto core
 function matrix_to_tto_core(mat::Matrix{ComplexF64})
-    res = zeros(ComplexF64, 2, 2, 1, 1)
-    for i in 1:2
-        for j in 1:2
-            res[i, j, 1, 1] = mat[i, j]
-        end
-    end
-    return res
+    return reshape(mat, (1, 1, 2, 2))
 end
 
-#takes a list of 2x2 matrices and returns the tto operator corresponding to mat_1 otimes mat_2 otimes ... otimes mat_3
 function kron_tto(mats::Vector{Matrix{ComplexF64}})
     nsites = length(mats)
     cores = Vector{Array{ComplexF64, 4}}(undef, nsites)
