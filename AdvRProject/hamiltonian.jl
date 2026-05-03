@@ -82,9 +82,9 @@ function tto_to_matrix(A::TensorTrain)
     end
 
     T_final = T[1, :, :, :, :, :, :]
-
+    
     perm = vcat(1:2:2*L-1, 2:2:2*L)
     T_permuted = permutedims(dropdims(T, dims=1), perm)
-
+    
     return reshape(T_permuted, 2^L, 2^L)
 end
