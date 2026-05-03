@@ -28,57 +28,45 @@ function matrix_to_tto_core(mat::Matrix{ComplexF64})
 end
 
 function kron_tto(mats::Vector{Matrix{ComplexF64}})
-    nsites = length(mats)
-    cores = Vector{Array{ComplexF64, 4}}(undef, nsites)
-
-    for i in 1:nsites
-        cores[i] = matrix_to_tto_core(mats[i])
-    end
-
-    return TToperator{ComplexF64, nsites}(nsites, cores, ntuple(_->2, nsites), ones(Int64, nsites+1), zeros(Int64, nsites))
+    cores = [matrix_to_tto_core(m) for m in mats]
+    return TensorTrain(cores)
 end
 
-# computes the long-range hamiltonian that can be found in "Unifying blabla...", p.4 eq.(7)
 function build_hamiltonian_tto(N::Int64, alpha::ComplexF64, J::ComplexF64)
-    res = zeros_tto(ComplexF64, ntuple(_->2, N), ones(Int64, N+1))
+    res = nothing
 
-    ## that loop is ugly !!!!
     for i = 1:(N-1)
         for j = (i+1):N
-            pauli_i_x = Vector{Matrix{ComplexF64}}(undef, N)
-            pauli_i_y = Vector{Matrix{ComplexF64}}(undef, N)
-            pauli_j_x = Vector{Matrix{ComplexF64}}(undef, N)
-            pauli_j_y = Vector{Matrix{ComplexF64}}(undef, N)
+            m_x = [id() for _ in 1:N]; m_x[i] = pauli_x(); m_x[j] = pauli_x()
+            m_y = [id() for _ in 1:N]; m_y[i] = pauli_y(); m_y[j] = pauli_y()
+
+            coeff = (1 / abs(i - j)^alpha)
+            h_ij = kron_tto(m_x) + kron_tto(m_y)
+
             for k in 1:N
-                pauli_i_x[k] = id()
-                pauli_i_y[k] = id()
-                pauli_j_x[k] = id()
-                pauli_j_y[k] = id()
+                h_ij.tensors[k] .*= coeff^(1/N)
             end
-            pauli_i_x[i] = pauli_x()
-            pauli_i_y[i] = pauli_y()
-            pauli_j_x[j] = pauli_x()
-            pauli_j_y[j] = pauli_y()
 
-            pauli_i_x_tto = kron_tto(pauli_i_x)
-            pauli_i_y_tto = kron_tto(pauli_i_y)
-            pauli_j_x_tto = kron_tto(pauli_j_x)
-            pauli_j_y_tto = kron_tto(pauli_j_y)
-
-            h_ij = pauli_i_x_tto * pauli_j_x_tto + pauli_i_y_tto * pauli_j_y_tto
-
-            res = res + (1/abs(i - j)^alpha) * h_ij
+            if res === nothing
+                res = h_ij
+            else
+                res = res + h_ij
+                compress!(res; svd_trunc = TruncThresh(1e-12))
+            end
         end
     end
-    return J/2 * res
+
+    final_scale = J/2
+    for k in 1:N
+        res.tensors[k] .*= final_scale^(1/N)
+    end
+    
+    return res
 end
 
-# takes a tto and returns the corresponding matrix, just for debugging
-function tto_to_matrix(A::TToperator)
-    N = A.N
-    dims = A.tto_dims
-
-    T = A.tto_vec[1][:, :, 1, :]
+function tto_to_matrix(A::TensorTrain)
+    L = length(A)
+    T = A.tensors[1][1, :, :, :] 
 
     for k in 2:N
         W = A.tto_vec[k]
