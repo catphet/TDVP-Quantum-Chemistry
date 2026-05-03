@@ -1,8 +1,16 @@
 using TensorTrains
 using LinearAlgebra
 
-res = build_hamiltonian_stupid(3, complex(1.), complex(1.))
-res_tto = build_hamiltonian_tto(3, complex(1.), complex(1.))
+include("hamiltonian.jl")
 
-display(res)
-display(tto_to_matrix(res_tto))
+N = 3
+alpha = complex(1.0)
+J = complex(1.0)
+
+println("Testing Stupid Hamiltonian...")
+h_mat = build_hamiltonian_stupid(N, alpha, J)
+display(h_mat)
+
+println("\nTesting TTO Hamiltonian...")
+h_tto = build_hamiltonian_tto(N, alpha, J)
+println("TTO built successfully!")
