@@ -16,11 +16,9 @@ end
 # computes the long-range hamiltonian that can be found in "Unifying blabla...", p.4 eq.(7)
 function build_hamiltonian_stupid(N::Int64, alpha::ComplexF64, J::ComplexF64)
     res = zeros(ComplexF64, 2^N, 2^N)
-    for i in 1:(N-1)
-        for j in (i+1):N
-            sig_i_x = kron_N_sites(pauli_x(), N, i)
-            sig_j_x = kron_N_sites(pauli_x(), N, j)
-            sig_i_y = kron_N_sites(pauli_y(), N, i)
+    for i in 1:(N-1), j in (i+1):N
+            h_ij = kron_N_sites(pauli_x(), N, i) * kron_N_sites(pauli_x(), N, j) + 
+kron_N_sites(pauli_y(), N, i)
             sig_j_y = kron_N_sites(pauli_y(), N, j)
 
             h_ij = sig_i_x * sig_j_x + sig_i_y * sig_j_y
