@@ -1,5 +1,4 @@
-include("hamiltonian.jl")
-include("timeevolution.jl")
+using TensorTrains
 using LinearAlgebra
 
 res = build_hamiltonian_stupid(3, complex(1.), complex(1.))
