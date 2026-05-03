@@ -68,30 +68,23 @@ function tto_to_matrix(A::TensorTrain)
     L = length(A)
     T = A.tensors[1][1, :, :, :] 
 
-    for k in 2:N
-        W = A.tto_vec[k]
+    for k in 2:L
 
-        nk = size(W, 1)
-        rk_prev = size(W, 3)
-        rk = size(W, 4)
-
-        sizeT = size(T)
-        left_dims = sizeT[1:end-1]
-        prod_left = prod(left_dims)
-
-        Tmat = reshape(T, prod_left, rk_prev)
-        Wmat = reshape(permutedims(W, (3,1,2,4)), rk_prev, :)
-
-        Tnew = Tmat * Wmat
-
-        T = reshape(Tnew, left_dims..., nk, nk, rk)
+        W = A.tensors[k]
+        r_left, r_right, d_in, d_out = size(W)
+        T_perm = permutedims(T, vcat(2:ndims(T), 1))
+        T_mat = reshape(T_perm, :, r_left)
+        W_mat = reshape(W, r_left, :)
+        res_raw = T_mat * W_mat
+        T = reshape(res_raw, size(T_perm)[1:end-1]..., r_right, d_in, d_out)
+        n_dims = ndims(T)
+        T = permutedims(T, vcat(n_dims-2, 1:n_dims-3, n_dims-1, n_dims))
     end
 
-    T = dropdims(T; dims=ndims(T))
+    T_final = T[1, :, :, :, :, :, :]
 
-    perm = vcat(collect(1:2:2N-1), collect(2:2:2N))
-    T = permutedims(T, perm)
+    perm = vcat(1:2:2*L-1, 2:2:2*L)
+    T_permuted = permutedims(dropdims(T, dims=1), perm)
 
-    d = prod(dims)
-    return reshape(T, d, d)
+    return reshape(T_permuted, 2^L, 2^L)
 end
