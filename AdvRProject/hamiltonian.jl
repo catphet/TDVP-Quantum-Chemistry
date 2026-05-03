@@ -16,7 +16,7 @@ end
 function build_hamiltonian_stupid(N::Int64, alpha::ComplexF64, J::ComplexF64)
     res = zeros(ComplexF64, 2^N, 2^N)
     for i in 1:(N-1), j in (i+1):N
-            h_ij = kron_N_sites(pauli_x(), N, i) * kron_N_sites(pauli_x(), N, j) + 
+        h_ij = kron_N_sites(pauli_x(), N, i) * kron_N_sites(pauli_x(), N, j) + 
                kron_N_sites(pauli_y(), N, i) * kron_N_sites(pauli_y(), N, j)
         res += (1 / abs(i - j)^alpha) * h_ij
     end
