@@ -1,3 +1,5 @@
+include("..\\src\\TensorTrains.jl")
+using .TensorTrains
 include("hamiltonian.jl")
 include("timeevolution.jl")
 using LinearAlgebra

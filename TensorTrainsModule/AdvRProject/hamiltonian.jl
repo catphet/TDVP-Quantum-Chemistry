@@ -1,4 +1,4 @@
-using TensorTrains
+using .TensorTrains
 
 function pauli_x()
     return ComplexF64[0 1; 1 0]

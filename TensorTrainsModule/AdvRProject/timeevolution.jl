@@ -1,4 +1,4 @@
-using TensorTrains
+using .TensorTrains
 
 # returns the canonical tt decomposition of rank <= rmax of a tensor 
 function ttv_svd_r(tensor::Array{T,d}, index=1, tol=1e-12, rmax=typemax(Int64)) where {T<:Number,d}
