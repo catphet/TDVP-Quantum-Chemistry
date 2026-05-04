@@ -1,10 +1,18 @@
-using TensorTrains
-using LinearAlgebra
+using .TensorTrains
 
-pauli_x() = ComplexF64[0 1; 1 0]
-pauli_y() = ComplexF64[0 -im; im 0]
-id()      = ComplexF64[1 0; 0 1]
+function pauli_x()
+    return ComplexF64[0 1; 1 0]
+end
 
+function pauli_y()
+    return ComplexF64[0 -im; im 0]
+end
+
+function id()
+    return ComplexF64[1 0; 0 1]
+end
+
+# returns id_2 otimes id_2 otimes ... otimes mat otimes ... otimes id_2
 function kron_N_sites(mat, N, index)
     res = ComplexF64[1]
     for i in 1:N
