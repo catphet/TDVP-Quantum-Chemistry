@@ -16,124 +16,83 @@ end
 function kron_N_sites(mat, N, index)
     res = ComplexF64[1]
     for i in 1:N
-        if i == index
-            res = kron(res, mat)
-        else
-            res = kron(res, id())
-        end
+        res = i == index ? kron(res, mat) : kron(res, id())
     end
     return res
 end
 
-# computes the long-range hamiltonian that can be found in "Unifying blabla...", p.4 eq.(7)
 function build_hamiltonian_stupid(N::Int64, alpha::ComplexF64, J::ComplexF64)
     res = zeros(ComplexF64, 2^N, 2^N)
-    for i in 1:(N-1)
-        for j in (i+1):N
-            sig_i_x = kron_N_sites(pauli_x(), N, i)
-            sig_j_x = kron_N_sites(pauli_x(), N, j)
-            sig_i_y = kron_N_sites(pauli_y(), N, i)
-            sig_j_y = kron_N_sites(pauli_y(), N, j)
-
-            h_ij = sig_i_x * sig_j_x + sig_i_y * sig_j_y
-
-            res = res + (1 / abs(i - j)^alpha) * h_ij
-        end
+    for i in 1:(N-1), j in (i+1):N
+        h_ij = kron_N_sites(pauli_x(), N, i) * kron_N_sites(pauli_x(), N, j) + 
+               kron_N_sites(pauli_y(), N, i) * kron_N_sites(pauli_y(), N, j)
+        res += (1 / abs(i - j)^alpha) * h_ij
     end
-    return J/2 * res
+    return (J/2) * res
 end
 
-####### using TT representation
-
-#takes a 2x2 matrix and returns the corresponding 2x2x1x1 tto core
 function matrix_to_tto_core(mat::Matrix{ComplexF64})
-    res = zeros(ComplexF64, 2, 2, 1, 1)
-    for i in 1:2
-        for j in 1:2
-            res[i, j, 1, 1] = mat[i, j]
+    return reshape(mat, (1, 1, 2, 2))
+end
+
+function kron_tto(mats::Vector{Matrix{ComplexF64}})
+    cores = [matrix_to_tto_core(m) for m in mats]
+    return TensorTrain(cores)
+end
+
+function build_hamiltonian_tto(N::Int64, alpha::ComplexF64, J::ComplexF64)
+    res = nothing
+
+    for i = 1:(N-1)
+        for j = (i+1):N
+            m_x = [id() for _ in 1:N]; m_x[i] = pauli_x(); m_x[j] = pauli_x()
+            m_y = [id() for _ in 1:N]; m_y[i] = pauli_y(); m_y[j] = pauli_y()
+
+            coeff = (1 / abs(i - j)^alpha)
+            h_ij = kron_tto(m_x) + kron_tto(m_y)
+
+            for k in 1:N
+                h_ij.tensors[k] .*= coeff^(1/N)
+            end
+
+            if res === nothing
+                res = h_ij
+            else
+                res = res + h_ij
+                compress!(res; svd_trunc = TruncThresh(1e-12))
+            end
         end
     end
+
+    final_scale = J/2
+    for k in 1:N
+        res.tensors[k] .*= final_scale^(1/N)
+    end
+    
     return res
 end
 
-#takes a list of 2x2 matrices and returns the tto operator corresponding to mat_1 otimes mat_2 otimes ... otimes mat_3
-function kron_tto(mats::Vector{Matrix{ComplexF64}})
-    nsites = length(mats)
-    cores = Vector{Array{ComplexF64, 4}}(undef, nsites)
+function tto_to_matrix(A::TensorTrain)
+    L = length(A)
+    T = A.tensors[1][1, :, :, :] 
 
-    for i in 1:nsites
-        cores[i] = matrix_to_tto_core(mats[i])
+    for k in 2:L
+
+        W = A.tensors[k]
+        r_left, r_right, d_in, d_out = size(W)
+        T_perm = permutedims(T, vcat(2:ndims(T), 1))
+        T_mat = reshape(T_perm, :, r_left)
+        W_mat = reshape(W, r_left, :)
+        res_raw = T_mat * W_mat
+        T = reshape(res_raw, size(T_perm)[1:end-1]..., r_right, d_in, d_out)
+        n_dims = ndims(T)
+        T = permutedims(T, vcat(n_dims-2, 1:n_dims-3, n_dims-1, n_dims))
     end
 
-    return TToperator{ComplexF64, nsites}(nsites, cores, ntuple(_->2, nsites), ones(Int64, nsites+1), zeros(Int64, nsites))
-end
-
-# computes the long-range hamiltonian that can be found in "Unifying blabla...", p.4 eq.(7)
-function build_hamiltonian_tto(N::Int64, alpha::ComplexF64, J::ComplexF64)
-    res = zeros_tto(ComplexF64, ntuple(_->2, N), ones(Int64, N+1))
-
-    ## that loop is ugly !!!!
-    for i = 1:(N-1)
-        for j = (i+1):N
-            pauli_i_x = Vector{Matrix{ComplexF64}}(undef, N)
-            pauli_i_y = Vector{Matrix{ComplexF64}}(undef, N)
-            pauli_j_x = Vector{Matrix{ComplexF64}}(undef, N)
-            pauli_j_y = Vector{Matrix{ComplexF64}}(undef, N)
-            for k in 1:N
-                pauli_i_x[k] = id()
-                pauli_i_y[k] = id()
-                pauli_j_x[k] = id()
-                pauli_j_y[k] = id()
-            end
-            pauli_i_x[i] = pauli_x()
-            pauli_i_y[i] = pauli_y()
-            pauli_j_x[j] = pauli_x()
-            pauli_j_y[j] = pauli_y()
-
-            pauli_i_x_tto = kron_tto(pauli_i_x)
-            pauli_i_y_tto = kron_tto(pauli_i_y)
-            pauli_j_x_tto = kron_tto(pauli_j_x)
-            pauli_j_y_tto = kron_tto(pauli_j_y)
-
-            h_ij = pauli_i_x_tto * pauli_j_x_tto + pauli_i_y_tto * pauli_j_y_tto
-
-            res = res + (1/abs(i - j)^alpha) * h_ij
-        end
-    end
-    return J/2 * res
-end
-
-# takes a tto and returns the corresponding matrix, just for debugging
-function tto_to_matrix(A::TToperator)
-    N = A.N
-    dims = A.tto_dims
-
-    T = A.tto_vec[1][:, :, 1, :]
-
-    for k in 2:N
-        W = A.tto_vec[k]
-
-        nk = size(W, 1)
-        rk_prev = size(W, 3)
-        rk = size(W, 4)
-
-        sizeT = size(T)
-        left_dims = sizeT[1:end-1]
-        prod_left = prod(left_dims)
-
-        Tmat = reshape(T, prod_left, rk_prev)
-        Wmat = reshape(permutedims(W, (3,1,2,4)), rk_prev, :)
-
-        Tnew = Tmat * Wmat
-
-        T = reshape(Tnew, left_dims..., nk, nk, rk)
-    end
-
-    T = dropdims(T; dims=ndims(T))
-
-    perm = vcat(collect(1:2:2N-1), collect(2:2:2N))
-    T = permutedims(T, perm)
-
-    d = prod(dims)
-    return reshape(T, d, d)
+    T_final = T[1, :, :, :, :, :, :]
+    
+    perm = vcat(1:2:2*L-1, 2:2:2*L)
+    T_permuted = permutedims(dropdims(T, dims=1), perm)
+    
+    return reshape(T_permuted, 2^L, 2^L)
 end
