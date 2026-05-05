@@ -1,0 +1,38 @@
+Since ours is on TDVP, we're prepared to explain things like the following:
+- What's an MPS? MPO? Tensor train? Manifold?
+- Why is TDVP useful? Why are long-range interactions relevant?
+- What does tangent space projection look like? Retraction?
+- Why do we care about bond dimension?
+- How can we validate this model?
+- Where can we go from here?
+
+--add application of problem stemming from quantum chem
+--relationship btw tensor network, hast to be related to quatnum info, btw mps quant info, 
+could do 2d hubbard model
+
+in the dupuy code theres an implementation of the hubbard model under models
+spits out coefficients, one mtx and one tensor, coffs of mtx  in the creation-annhialiation operator
+fx taking hv_to_mpo fx; gives mpo rep of hamiltonian, can fit coeffs to 
+hubbard_2d_dmrg -- nearest neighbors hamiltonian, needs to find an ordering/labeling of these 8 sites
+the representation can make neighbors look far away, can see the representation of the ranks that you choose
+
+has ex of change ordering...?
+
+pick 2 orderings, like the one trying to keep together the closest 
+and the one that introduces lng range interactions
+can also pick 
+each spin system has up down, so has 16d, 16 sites for 8, so instead reduce down to 6 sites
+snake introduces long range due to the parameterization, would need higher ranks to reproduce the exact evolution
+but when you keep everything compact, should get good accuracey get moderate ranks
+
+RELATIONSHIP BTW
+ENTANGLEMENT w rank
+influence btw represetino and physics behind it
+bad paramenterations fucks shit up - increases entanglement, dont do that/prove it
+qi is how subsystems are entangled
+needs to propogate through the rest of thraing
+
+ADD ILLUSTRATION
+
+inference of the numerical parameters for the orthogonal projection need to implemet
+catapillar too

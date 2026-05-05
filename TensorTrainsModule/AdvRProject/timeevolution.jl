@@ -1,5 +1,15 @@
 using .TensorTrains
 
+#kp here change to truncate wrt a threshold, not rank, changing tolerance 
+#has inference in the final state observed
+#if ranks are not constrained, what is the inference of the tolerance? if too smmall, no trunctation, should get exact dynames
+#if increase the truncation, how tight tolerance is in ttsvd, how many time steps we want to do
+#diff in projection case, account for projection onto tangent space
+###  ~~~interpretation of numbers picking timesteps wrt targets, now diff sources of errors need to be balanced to reach some accuracy
+# project onto tangetn space AT EACH STEP too - at the level of the mps, never at the tensor level, stay in the train
+#also graphs log scale, see convergence and rate of convergence
+#time bigger systems
+#18th next meeting 2p:30m!!! ~send doc time/recording, poss avail 28 pm, or 26, 22nd better
 # returns the canonical tt decomposition of rank <= rmax of a tensor 
 function ttv_svd_r(tensor::Array{T,d}, index=1, tol=1e-12, rmax=typemax(Int64)) where {T<:Number,d}
     dims = size(tensor)
@@ -128,11 +138,17 @@ function time_evolution(state::TTvector{ComplexF64, N}, hamiltonian::TToperator{
     return state
 end
 
+#kp too baby version -- do more tests with larger systems, 10 particles at least 
+#compare this approach to tangent projection
+#projection on the tangetn space and THEN do the svd, and then compare the tqow approaches (fx below)
+#should be mroe accurate -- error less than 3%
+#maybe dont truncate wrt rank but a threshold
 # psi_(n+1) = TT-SVD_r(psi_n - timestep * i * H * psi_n)
 function time_evolution_MPS(state::TTvector{ComplexF64, N}, hamiltonian::TToperator{ComplexF64, N}, t::Float64, timestep::Float64; rmax::Int64=typemax(Int64)) where {N}
     while(t > 0)
         t -= timestep
-        state = ttv_svd_r(state - im * complex(timestep) * hamiltonian * state; rmax=rmax)
+        state = ttv_svd_r(state - im * complex(timestep) * hamiltonian * state; rmax=rmax) #project back to manifold, correct for normal directionsand tangent diretions, should be taken care of by the projection onto the tangent space 
+        #
     end
     return state
 end
