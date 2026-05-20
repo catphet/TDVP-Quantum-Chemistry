@@ -225,3 +225,74 @@ end
 function tt_compression_par(A::TToperator;tol=1e-14,Imax=2)
 	return ttv_to_tto(tt_compression_par(tto_to_ttv(A);tol=tol,Imax=Imax))
 end
+
+# Tangent space projection of H*psi onto the tangent space of the MPS manifold at site i
+# Uses mixed canonical form: left-orthogonal for k<i, right-orthogonal for k>i
+function tangent_proj(state::TTvector{ComplexF64,N}, Hpsi::TTvector{ComplexF64,N}, i::Int) where {N}
+    d = state.N
+    proj = zeros_tt(ComplexF64, state.ttv_dims, state.ttv_rks)
+    
+    # For each site k, project Hpsi onto the tangent component at site k
+    # The tangent space projection is: P_T(Z) = sum_k P_k(Z) - sum_k P_{k,k+1}(Z)
+    # where P_k projects onto the component where only core k is free
+    
+    # Build left environments L[k] = <phi_L^{1:k-1} | Z_L^{1:k-1}>
+    L = Vector{Matrix{ComplexF64}}(undef, d+1)
+    L[1] = ones(ComplexF64, 1, 1)
+    for k in 1:d-1
+        rk = state.ttv_rks[k+1]
+        Lk = zeros(ComplexF64, rk, Hpsi.ttv_rks[k+1])
+        @tensor Lk[a,b] = L[k][α,β] * conj(state.ttv_vec[k])[z,α,a] * Hpsi.ttv_vec[k][z,β,b]
+        L[k+1] = Lk
+    end
+    
+    # Build right environments R[k] = <phi_R^{k+1:d} | Z_R^{k+1:d}>
+    R = Vector{Matrix{ComplexF64}}(undef, d+1)
+    R[d+1] = ones(ComplexF64, 1, 1)
+    for k in d:-1:2
+        rk = state.ttv_rks[k]
+        Rk = zeros(ComplexF64, Hpsi.ttv_rks[k], rk)
+        @tensor Rk[a,b] = Hpsi.ttv_vec[k][z,a,α] * conj(state.ttv_vec[k])[z,b,β] * R[k+1][α,β]
+        R[k] = Rk
+    end
+    R[1] = ones(ComplexF64, Hpsi.ttv_rks[1], state.ttv_rks[1])
+    
+    # Project at orthogonality center i
+    # projected core = L[i] * Hpsi_core[i] * R[i+1]
+    rk_left = state.ttv_rks[i]
+    rk_right = state.ttv_rks[i+1]
+    proj_core = zeros(ComplexF64, state.ttv_dims[i], rk_left, rk_right)
+    @tensor proj_core[z,a,b] = L[i][a,α] * Hpsi.ttv_vec[i][z,α,β] * R[i+1][β,b]
+    
+    # Build output TTvector: same as state but with projected core at site i
+    out_vec = deepcopy(state.ttv_vec)
+    out_vec[i] = proj_core
+    
+    return TTvector{ComplexF64,N}(d, out_vec, state.ttv_dims, state.ttv_rks, state.ttv_ot)
+end
+
+# psi_(n+1) = TT-SVD_r(psi_n - timestep * P_T_MPS * i * H * psi_n)
+function time_evolution_tangent_proj(state::TTvector{ComplexF64,N}, hamiltonian::TToperator{ComplexF64,N}, t::Float64, timestep::Float64; rmax::Int64=typemax(Int64)) where {N}
+    d = state.N
+    while t > 0
+        t -= timestep
+        # Put state in mixed canonical form with center at site 1
+        state_orth = orthogonalize(state; i=1)
+        
+        # Compute H*psi
+        Hpsi = hamiltonian * state_orth
+        
+        # TDVP sweep: update each site using tangent projection
+        for i in 1:d
+            # Move orthogonality center to site i
+            state_orth = orthogonalize(state_orth; i=i)
+            Hpsi_i = hamiltonian * state_orth
+            
+            # Project onto tangent space at site i and take Euler step
+            proj_i = tangent_proj(state_orth, Hpsi_i, i)
+            state_orth = ttv_svd_r(state_orth - im * complex(timestep/d) * proj_i; rmax=rmax)
+        end
+        state = state_orth
+    end
+    return state
+end

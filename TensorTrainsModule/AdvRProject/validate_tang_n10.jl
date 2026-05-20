@@ -6,7 +6,7 @@ include("hamiltonian.jl")
 include("timeevolution.jl")
 
 # Redirect output to both terminal and file
-log_file = open("results_n10.txt", "w")  
+log_file = open("results_tang_n10.txt", "w")  
 
 function logprint(args...)
     println(args...)
@@ -21,7 +21,7 @@ t_total = 0.5
 dt_coarse = 0.05
 dt_fine = 0.01
 
-logprint("/// N=$N VALIDATION ///\n")
+logprint("/// N=$N TANGENT PROJECTION VALIDATION ///\n")
 
 logprint("/// STEP 1: Build exact matrix Hamiltonian ///")
 H_mat = build_hamiltonian_s(N, alpha, J)
@@ -89,5 +89,19 @@ logprint("Warming up...")
 time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
 logprint("Timing for N=$N, dt=$dt_fine:")
 @time time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+
+logprint("\n/// STEP 8: Tangent projection time evolution ///")
+psi_t_tangent = time_evolution_tangent_proj(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+overlap_tangent = dot(psi_0_plus, psi_t_tangent)
+prob_tangent = abs(overlap_tangent)^2
+logprint("Tangent proj survival probability: ", prob_tangent)
+logprint("Error vs exact:                    ", abs(prob_plus_exact - prob_tangent))
+
+logprint("\n/// FULL COMPARISON ///")
+logprint("Exact:           ", prob_plus_exact)
+logprint("Euler+SVD dt=0.01: ", prob_plus_fine)
+logprint("Tangent proj:    ", prob_tangent)
+logprint("Error Euler+SVD: ", abs(prob_plus_exact - prob_plus_fine))
+logprint("Error tangent:   ", abs(prob_plus_exact - prob_tangent))
 
 close(log_file)

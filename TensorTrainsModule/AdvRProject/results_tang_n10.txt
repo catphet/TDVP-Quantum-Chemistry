@@ -1,0 +1,42 @@
+/// N=10 TANGENT PROJECTION VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |0...0⟩ is not an eigenstate ///
+H|0...0⟩ all zeros: true
+
+/// STEP 3: Exact time evolution (slow for N=10) ///
+Exact survival probability: 0.9999999999999996
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |0...0⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Running exact evolution for |+⟩⊗N...
+Running TDVP coarse (dt=0.05)...
+Running TDVP fine (dt=0.01)...
+Exact survival probability:          0.5903234690065826
+TDVP survival probability (dt=0.05): 8.92216088591491
+Error (dt=0.05):                     8.331837416908327
+TDVP survival probability (dt=0.01): 1.026602679668212
+Error (dt=0.01):                     0.43627921066162934
+
+/// STEP 7: Timing (post-compilation) ///
+Warming up...
+Timing for N=10, dt=0.01:
+
+/// STEP 8: Tangent projection time evolution ///
+Tangent proj survival probability: 0.9999999999999969
+Error vs exact:                    0.4096765309934143
+
+/// FULL COMPARISON ///
+Exact:           0.5903234690065826
+Euler+SVD dt=0.01: 1.026602679668212
+Tangent proj:    0.9999999999999969
+Error Euler+SVD: 0.43627921066162934
+Error tangent:   0.4096765309934143

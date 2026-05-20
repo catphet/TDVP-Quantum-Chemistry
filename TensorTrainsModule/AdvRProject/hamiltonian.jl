@@ -24,7 +24,7 @@ function kron_N_sites(mat, N, index)
     return res
 end
 
-function build_hamiltonian_stupid(N::Int64, alpha::ComplexF64, J::ComplexF64)
+function build_hamiltonian_s(N::Int64, alpha::ComplexF64, J::ComplexF64)
     res = zeros(ComplexF64, 2^N, 2^N)
     for i in 1:(N-1)
         for j in (i+1):N

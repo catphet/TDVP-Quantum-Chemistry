@@ -1,0 +1,39 @@
+/// N=3 TANGENT PROJECTION VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |000⟩ is not an eigenstate ///
+H|000⟩ = ComplexF64[0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im]
+(if all zeros, |000⟩ is an eigenstate and survival probability will trivially be 1.0)
+
+/// STEP 3: Exact time evolution ///
+Exact survival probability: 1.0
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |000⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Exact survival probability:          0.8682984082839635
+TDVP survival probability (dt=0.05): 0.8974008915579607
+Error (dt=0.05):                     0.029102483273997115
+TDVP survival probability (dt=0.01): 0.8780503221963222
+Error (dt=0.01):                     0.009751913912358634
+
+/// STEP 7: Timing (post-compilation) ///
+Timing for N=3, dt=0.01:
+
+/// STEP 8: Tangent projection time evolution ///
+Tangent proj survival probability: 0.9999999999999991
+Error vs exact:                    0.13170159171603557
+
+/// FULL COMPARISON ///
+Exact:           0.8682984082839635
+Euler+SVD dt=0.01: 0.8780503221963222
+Tangent proj:    0.9999999999999991
+Error Euler+SVD: 0.009751913912358634
+Error tangent:   0.13170159171603557

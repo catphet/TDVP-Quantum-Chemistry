@@ -25,3 +25,9 @@ Implementing and Benchmarking TDVP for Quantum Chemistry applications
 4. Call desired validation script (test.jl, validate_n3.jl, or validate_n5.jl):
    
    julia --project=.. validate_n3.jl
+
+
+   kp note
+
+   julia --project=.. compile_results.jl
+   .\run_all_validations.ps1

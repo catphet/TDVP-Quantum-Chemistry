@@ -6,7 +6,7 @@ include("hamiltonian.jl")
 include("timeevolution.jl")
 
 # Redirect output to both terminal and file
-log_file = open("results_n10.txt", "w")  
+log_file = open("results_tang_n5.txt", "w")  
 
 function logprint(args...)
     println(args...)
@@ -14,30 +14,29 @@ function logprint(args...)
     flush(log_file)
 end
 
-N = 10
+N = 5
 alpha = complex(1.0)
 J = complex(1.0)
 t_total = 0.5
 dt_coarse = 0.05
 dt_fine = 0.01
 
-logprint("/// N=$N VALIDATION ///\n")
+logprint("/// N=$N TANGENT PROJECTION VALIDATION ///\n")
 
 logprint("/// STEP 1: Build exact matrix Hamiltonian ///")
 H_mat = build_hamiltonian_s(N, alpha, J)
 logprint("Hermitian: ", ishermitian(H_mat))
 
-logprint("\n/// STEP 2: Check |0...0⟩ is not an eigenstate ///")
+logprint("\n/// STEP 2: Check |00000⟩ is not an eigenstate ///")
 psi_0_vec = zeros(ComplexF64, 2^N)
 psi_0_vec[1] = 1.0
 Hpsi = H_mat * psi_0_vec
-logprint("H|0...0⟩ all zeros: ", all(x -> abs(x) < 1e-10, Hpsi))
+logprint("H|00000⟩ = ", Hpsi)
+logprint("(if all zeros, |00000⟩ is an eigenstate and survival probability will trivially be 1.0)")
 
-logprint("\n/// STEP 3: Exact time evolution (slow for N=$N) ///")
-@time begin
-    psi_t_exact = exp(-im * H_mat * t_total) * psi_0_vec
-    prob_exact = abs(dot(psi_0_vec, psi_t_exact))^2
-end
+logprint("\n/// STEP 3: Exact time evolution ///")
+psi_t_exact = exp(-im * H_mat * t_total) * psi_0_vec
+prob_exact = abs(dot(psi_0_vec, psi_t_exact))^2
 logprint("Exact survival probability: ", prob_exact)
 
 logprint("\n/// STEP 4: Check TTO Hamiltonian matches exact matrix ///")
@@ -47,7 +46,7 @@ diff = norm(H_tto_mat - H_mat)
 logprint("||H_tto - H_mat|| = ", diff)
 logprint("(should be near zero, < 1e-10)")
 
-logprint("\n/// STEP 5: TDVP time evolution |0...0⟩ ///")
+logprint("\n/// STEP 5: TDVP time evolution |00000⟩ ///")
 rks = ones(Int, N+1)
 psi_0_tt = zeros_tt(ComplexF64, ntuple(_ -> 2, N), rks)
 for i in 1:N
@@ -66,15 +65,12 @@ for i in 1:N
 end
 psi_0_plus_vec = fill(ComplexF64((1/sqrt(2))^N), 2^N)
 
-logprint("Running exact evolution for |+⟩⊗N...")
 psi_t_plus_exact = exp(-im * H_mat * t_total) * psi_0_plus_vec
 prob_plus_exact = abs(dot(psi_0_plus_vec, psi_t_plus_exact))^2
 
-logprint("Running TDVP coarse (dt=$dt_coarse)...")
 psi_t_plus_coarse = time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_coarse; rmax=100)
 prob_plus_coarse = abs(dot(psi_0_plus, psi_t_plus_coarse))^2
 
-logprint("Running TDVP fine (dt=$dt_fine)...")
 psi_t_plus_fine = time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
 prob_plus_fine = abs(dot(psi_0_plus, psi_t_plus_fine))^2
 
@@ -89,5 +85,19 @@ logprint("Warming up...")
 time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
 logprint("Timing for N=$N, dt=$dt_fine:")
 @time time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+
+logprint("\n/// STEP 8: Tangent projection time evolution ///")
+psi_t_tangent = time_evolution_tangent_proj(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+overlap_tangent = dot(psi_0_plus, psi_t_tangent)
+prob_tangent = abs(overlap_tangent)^2
+logprint("Tangent proj survival probability: ", prob_tangent)
+logprint("Error vs exact:                    ", abs(prob_plus_exact - prob_tangent))
+
+logprint("\n/// FULL COMPARISON ///")
+logprint("Exact:           ", prob_plus_exact)
+logprint("Euler+SVD dt=0.01: ", prob_plus_fine)
+logprint("Tangent proj:    ", prob_tangent)
+logprint("Error Euler+SVD: ", abs(prob_plus_exact - prob_plus_fine))
+logprint("Error tangent:   ", abs(prob_plus_exact - prob_tangent))
 
 close(log_file)
