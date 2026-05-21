@@ -26,3 +26,6 @@ Error (dt=0.01):                     0.009751913912358634
 
 /// STEP 7: Timing (post-compilation) ///
 Timing for N=3, dt=0.01:
+Elapsed time: 0.0366024 seconds
+Memory: 3685138 bytes
+Allocations: 0.0 gc time

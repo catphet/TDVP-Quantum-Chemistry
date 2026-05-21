@@ -8,7 +8,7 @@ function logprint(args...)
 end
 
 
-files = ["results_n3.txt", "results_n5.txt", "results_n10.txt", "results_tang_n3.txt", "results_tang_n5.txt", "results_tang_n10.txt"]
+files = ["results_n3.txt", "results_n5.txt", "results_n10.txt"]#, "results_tang_n3.txt", "results_tang_n5.txt", "results_tang_n10.txt"]
 
 for f in files
     if isfile(f)

@@ -84,7 +84,8 @@ logprint("\n/// STEP 7: Timing (post-compilation) ///")
 logprint("Warming up...")
 time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
 logprint("Timing for N=$N, dt=$dt_fine:")
-@time time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+t_elapsed = @elapsed time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+logprint("Elapsed time: ", t_elapsed, " seconds") 
 
 logprint("\n/// STEP 8: Tangent projection time evolution ///")
 psi_t_tangent = time_evolution_tangent_proj(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
@@ -99,5 +100,6 @@ logprint("Euler+SVD dt=0.01: ", prob_plus_fine)
 logprint("Tangent proj:    ", prob_tangent)
 logprint("Error Euler+SVD: ", abs(prob_plus_exact - prob_plus_fine))
 logprint("Error tangent:   ", abs(prob_plus_exact - prob_tangent))
+
 
 close(log_file)

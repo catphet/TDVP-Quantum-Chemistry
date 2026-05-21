@@ -26,14 +26,3 @@ Error (dt=0.01):                     0.009751913912358634
 
 /// STEP 7: Timing (post-compilation) ///
 Timing for N=3, dt=0.01:
-
-/// STEP 8: Tangent projection time evolution ///
-Tangent proj survival probability: 0.9999999999999991
-Error vs exact:                    0.13170159171603557
-
-/// FULL COMPARISON ///
-Exact:           0.8682984082839635
-Euler+SVD dt=0.01: 0.8780503221963222
-Tangent proj:    0.9999999999999991
-Error Euler+SVD: 0.009751913912358634
-Error tangent:   0.13170159171603557

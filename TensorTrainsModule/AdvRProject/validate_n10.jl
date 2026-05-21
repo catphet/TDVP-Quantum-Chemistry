@@ -85,9 +85,12 @@ logprint("TDVP survival probability (dt=0.01): ", prob_plus_fine)
 logprint("Error (dt=0.01):                     ", abs(prob_plus_exact - prob_plus_fine))
 
 logprint("\n/// STEP 7: Timing (post-compilation) ///")
-logprint("Warming up...")
+# warmup run to trigger compilation
 time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
 logprint("Timing for N=$N, dt=$dt_fine:")
-@time time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+stats = @timed time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
+logprint("Elapsed time: ", stats.time, " seconds")
+logprint("Memory: ", stats.bytes, " bytes")
+logprint("Allocations: ", stats.gctime, " gc time")
 
 close(log_file)

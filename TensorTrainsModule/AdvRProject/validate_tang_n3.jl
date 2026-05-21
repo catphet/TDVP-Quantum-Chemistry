@@ -85,7 +85,8 @@ logprint("\n/// STEP 7: Timing (post-compilation) ///")
 # warmup run to trigger compilation
 time_evolution_MPS(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)
 logprint("Timing for N=$N, dt=$dt_fine:")
-@btime time_evolution_MPS($psi_0_plus, $H_tto, $t_total, $dt_fine; rmax=100)
+t_elapsed = @elapsed time_evolution_MPS($psi_0_plus, $H_tto, $t_total, $dt_fine; rmax=100)
+logprint("Elapsed time: ", t_elapsed, " seconds") 
 
 logprint("\n/// STEP 8: Tangent projection time evolution ///")
 psi_t_tangent = time_evolution_tangent_proj(psi_0_plus, H_tto, t_total, dt_fine; rmax=100)

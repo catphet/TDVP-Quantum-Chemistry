@@ -1,0 +1,245 @@
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)FILE: results_n3.txt
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)/// N=3 VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |000⟩ is not an eigenstate ///
+H|000⟩ = ComplexF64[0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im]
+(if all zeros, |000⟩ is an eigenstate and survival probability will trivially be 1.0)
+
+/// STEP 3: Exact time evolution ///
+Exact survival probability: 1.0
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |000⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Exact survival probability:          0.8682984082839635
+TDVP survival probability (dt=0.05): 0.8974008915579607
+Error (dt=0.05):                     0.029102483273997115
+TDVP survival probability (dt=0.01): 0.8780503221963222
+Error (dt=0.01):                     0.009751913912358634
+
+/// STEP 7: Timing (post-compilation) ///
+Timing for N=3, dt=0.01:
+
+IOStream(<file compiled_results.txt>)
+
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)FILE: results_n5.txt
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)/// N=5 VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |00000⟩ is not an eigenstate ///
+H|00000⟩ = ComplexF64[0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im]
+(if all zeros, |00000⟩ is an eigenstate and survival probability will trivially be 1.0)
+
+/// STEP 3: Exact time evolution ///
+Exact survival probability: 0.9999999999999998
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |00000⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Exact survival probability:          0.7519666421949727
+TDVP survival probability (dt=0.05): 1.0246663011766526
+Error (dt=0.05):                     0.2726996589816799
+TDVP survival probability (dt=0.01): 0.8015004061054739
+Error (dt=0.01):                     0.04953376391050124
+
+/// STEP 7: Timing (post-compilation) ///
+Warming up...
+Timing for N=5, dt=0.01:
+
+IOStream(<file compiled_results.txt>)
+
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)FILE: results_n10.txt
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)/// N=10 VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |0...0⟩ is not an eigenstate ///
+H|0...0⟩ all zeros: true
+
+/// STEP 3: Exact time evolution (slow for N=10) ///
+Exact survival probability: 0.9999999999999996
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |0...0⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Running exact evolution for |+⟩⊗N...
+Running TDVP coarse (dt=0.05)...
+Running TDVP fine (dt=0.01)...
+Exact survival probability:          0.5903234690065826
+TDVP survival probability (dt=0.05): 8.92216088591491
+Error (dt=0.05):                     8.331837416908327
+TDVP survival probability (dt=0.01): 1.026602679668212
+Error (dt=0.01):                     0.43627921066162934
+
+/// STEP 7: Timing (post-compilation) ///
+Warming up...
+Timing for N=10, dt=0.01:
+
+IOStream(<file compiled_results.txt>)
+
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)FILE: results_tang_n3.txt
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)/// N=3 TANGENT PROJECTION VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |000⟩ is not an eigenstate ///
+H|000⟩ = ComplexF64[0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im]
+(if all zeros, |000⟩ is an eigenstate and survival probability will trivially be 1.0)
+
+/// STEP 3: Exact time evolution ///
+Exact survival probability: 1.0
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |000⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Exact survival probability:          0.8682984082839635
+TDVP survival probability (dt=0.05): 0.8974008915579607
+Error (dt=0.05):                     0.029102483273997115
+TDVP survival probability (dt=0.01): 0.8780503221963222
+Error (dt=0.01):                     0.009751913912358634
+
+/// STEP 7: Timing (post-compilation) ///
+Timing for N=3, dt=0.01:
+
+/// STEP 8: Tangent projection time evolution ///
+Tangent proj survival probability: 0.9999999999999991
+Error vs exact:                    0.13170159171603557
+
+/// FULL COMPARISON ///
+Exact:           0.8682984082839635
+Euler+SVD dt=0.01: 0.8780503221963222
+Tangent proj:    0.9999999999999991
+Error Euler+SVD: 0.009751913912358634
+Error tangent:   0.13170159171603557
+
+IOStream(<file compiled_results.txt>)
+
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)FILE: results_tang_n5.txt
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)/// N=5 TANGENT PROJECTION VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |00000⟩ is not an eigenstate ///
+H|00000⟩ = ComplexF64[0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im, 0.0 + 0.0im]
+(if all zeros, |00000⟩ is an eigenstate and survival probability will trivially be 1.0)
+
+/// STEP 3: Exact time evolution ///
+Exact survival probability: 0.9999999999999998
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |00000⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Exact survival probability:          0.7519666421949727
+TDVP survival probability (dt=0.05): 1.0246663011766526
+Error (dt=0.05):                     0.2726996589816799
+TDVP survival probability (dt=0.01): 0.8015004061054739
+Error (dt=0.01):                     0.04953376391050124
+
+/// STEP 7: Timing (post-compilation) ///
+Warming up...
+Timing for N=5, dt=0.01:
+
+/// STEP 8: Tangent projection time evolution ///
+Tangent proj survival probability: 0.9999999999999984
+Error vs exact:                    0.24803335780502578
+
+/// FULL COMPARISON ///
+Exact:           0.7519666421949727
+Euler+SVD dt=0.01: 0.8015004061054739
+Tangent proj:    0.9999999999999984
+Error Euler+SVD: 0.04953376391050124
+Error tangent:   0.24803335780502578
+
+IOStream(<file compiled_results.txt>)
+
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)FILE: results_tang_n10.txt
+IOStream(<file compiled_results.txt>)============================================================
+IOStream(<file compiled_results.txt>)/// N=10 TANGENT PROJECTION VALIDATION ///
+
+/// STEP 1: Build exact matrix Hamiltonian ///
+Hermitian: true
+
+/// STEP 2: Check |0...0⟩ is not an eigenstate ///
+H|0...0⟩ all zeros: true
+
+/// STEP 3: Exact time evolution (slow for N=10) ///
+Exact survival probability: 0.9999999999999996
+
+/// STEP 4: Check TTO Hamiltonian matches exact matrix ///
+||H_tto - H_mat|| = 0.0
+(should be near zero, < 1e-10)
+
+/// STEP 5: TDVP time evolution |0...0⟩ ///
+TDVP survival probability: 1.0
+
+/// STEP 6: Non-trivial initial state |+⟩⊗N ///
+Running exact evolution for |+⟩⊗N...
+Running TDVP coarse (dt=0.05)...
+Running TDVP fine (dt=0.01)...
+Exact survival probability:          0.5903234690065826
+TDVP survival probability (dt=0.05): 8.92216088591491
+Error (dt=0.05):                     8.331837416908327
+TDVP survival probability (dt=0.01): 1.026602679668212
+Error (dt=0.01):                     0.43627921066162934
+
+/// STEP 7: Timing (post-compilation) ///
+Warming up...
+Timing for N=10, dt=0.01:
+
+/// STEP 8: Tangent projection time evolution ///
+Tangent proj survival probability: 0.9999999999999969
+Error vs exact:                    0.4096765309934143
+
+/// FULL COMPARISON ///
+Exact:           0.5903234690065826
+Euler+SVD dt=0.01: 1.026602679668212
+Tangent proj:    0.9999999999999969
+Error Euler+SVD: 0.43627921066162934
+Error tangent:   0.4096765309934143
+
+IOStream(<file compiled_results.txt>)
+

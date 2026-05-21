@@ -2,10 +2,10 @@
 $scripts = @(
     "validate_n3.jl",
     "validate_n5.jl",
-    "validate_n10.jl",
-    "validate_tang_n3.jl",
-    "validate_tang_n5.jl",
-    "validate_tang_n10.jl"
+    "validate_n10.jl"#,
+   # "validate_tang_n3.jl",
+   # "validate_tang_n5.jl",
+   # "validate_tang_n10.jl"
 )
 
 foreach ($script in $scripts) {

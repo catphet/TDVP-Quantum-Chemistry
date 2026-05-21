@@ -27,5 +27,7 @@ TDVP survival probability (dt=0.01): 1.026602679668212
 Error (dt=0.01):                     0.43627921066162934
 
 /// STEP 7: Timing (post-compilation) ///
-Warming up...
 Timing for N=10, dt=0.01:
+Elapsed time: 117.9714961 seconds
+Memory: 90041725596 bytes
+Allocations: 41.9256905 gc time
